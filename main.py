@@ -25,7 +25,7 @@ BLUE = (51,51,255)
 LIGHT_BLUE = (65, 105, 255)
 
 SNAKE_SPEED = 10  # Скорость змейки (количество движений в секунду)
-WIN_SCORE = 20    # Сколько очков нужно для победы
+WIN_SCORE = 3    # Сколько очков нужно для победы
 
 # --- 3. Настройка окна игры ---
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -73,6 +73,7 @@ direction = (0, 0) # Инициализируется в reset_game()
 food = (0, 0) # Инициализируется в reset_game()
 score = 0 # Инициализируется в reset_game()
 game_over = False # Инициализируется в reset_game()
+game_won = False
 
 # Первый запуск игры
 reset_game()
