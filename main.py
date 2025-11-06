@@ -147,7 +147,7 @@ while running:
     # Отрисовка сообщения "Game Over"
     if game_over:
         game_over_text = font.render("Проигрыш! Нажмите R для перезапуска.", True, BLACK)
-        text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH / 2 + 65, INFO_BAR_HEIGHT / 2))
+        text_rect = game_over_text.get_rect(center=(365, INFO_BAR_HEIGHT / 2))
         screen.blit(game_over_text, text_rect)
 
     # Обновление всего экрана
