@@ -25,6 +25,7 @@ BLUE = (51,51,255)
 LIGHT_BLUE = (65, 105, 255)
 
 SNAKE_SPEED = 10  # Скорость змейки (количество движений в секунду)
+WIN_SCORE = 20    # Сколько очков нужно для победы
 
 # --- 3. Настройка окна игры ---
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -116,7 +117,12 @@ while running:
             # Проверка, съела ли змейка еду
             if new_head == food:
                 score += 1
-                food = generate_food(snake) # Генерируем новую еду
+                # Проверяем условие победы
+                if score >= WIN_SCORE:
+                    game_over = True
+                    game_won = True
+                else:
+                    food = generate_food(snake) # Генерируем новую еду
             else:
                 snake.pop() # Удаляем хвост, если еда не была съедена (змейка движется)
 
@@ -146,9 +152,10 @@ while running:
 
     # Отрисовка сообщения "Game Over"
     if game_over:
-        game_over_text = font.render("Проигрыш! Нажмите R для перезапуска.", True, BLACK)
-        text_rect = game_over_text.get_rect(center=(365, INFO_BAR_HEIGHT / 2))
-        screen.blit(game_over_text, text_rect)
+        message = "Победа! Нажмите R для перезапуска." if game_won else "Проигрыш! Нажмите R для перезапуска."
+        status_text = font.render(message, True, BLACK)
+        text_rect = status_text.get_rect(center=(365, INFO_BAR_HEIGHT / 2))
+        screen.blit(status_text, text_rect)
 
     # Обновление всего экрана
     pygame.display.flip()
