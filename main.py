@@ -8,19 +8,24 @@ pygame.init()
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
 GRID_SIZE = 20  # Размер одного сегмента змейки и еды в пикселях
+
+INFO_BAR_HEIGHT = 60  # Высота верхней информационной панели (кратно GRID_SIZE)
+# Размеры сетки с учетом информационной панели
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
-GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
+GRID_HEIGHT = (SCREEN_HEIGHT - INFO_BAR_HEIGHT) // GRID_SIZE
 
 # Цвета
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
-lightGrean = (120, 215, 120)
+LIGHT_GREEN = (120, 215, 120)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 GRAY = (120, 120, 120)
-BLUE = (20,20,200)
+BLUE = (51,51,255)
+LIGHT_BLUE = (65, 105, 255)
 
 SNAKE_SPEED = 10  # Скорость змейки (количество движений в секунду)
+WIN_SCORE = 20    # Сколько очков нужно для победы
 
 # --- 3. Настройка окна игры ---
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -40,11 +45,14 @@ def generate_food(snake_body):
             return (food_x, food_y)
 
 def draw_grid():
-    """Рисует сетку на экране для наглядности (опционально)."""
+    """Рисует сетку на экране для наглядности (только в зоне игрового поля)."""
     for x in range(0, SCREEN_WIDTH, GRID_SIZE):
-        pygame.draw.line(screen, GRAY, (x, 0), (x, SCREEN_HEIGHT))
-    for y in range(0, SCREEN_HEIGHT, GRID_SIZE):
+        pygame.draw.line(screen, GRAY, (x, INFO_BAR_HEIGHT), (x, SCREEN_HEIGHT))
+    # Горизонтальные линии — начиная от нижней границы инфо-панели
+    for y in range(INFO_BAR_HEIGHT, SCREEN_HEIGHT, GRID_SIZE):
         pygame.draw.line(screen, GRAY, (0, y), (SCREEN_WIDTH, y))
+    # Разделительная линия под информационной панелью
+    pygame.draw.line(screen, BLACK, (0, INFO_BAR_HEIGHT), (SCREEN_WIDTH, INFO_BAR_HEIGHT), 2)
 
 def reset_game():
     """Сбрасывает все игровые параметры для новой игры."""
@@ -109,34 +117,45 @@ while running:
             # Проверка, съела ли змейка еду
             if new_head == food:
                 score += 1
-                food = generate_food(snake) # Генерируем новую еду
+                # Проверяем условие победы
+                if score >= WIN_SCORE:
+                    game_over = True
+                    game_won = True
+                else:
+                    food = generate_food(snake) # Генерируем новую еду
             else:
                 snake.pop() # Удаляем хвост, если еда не была съедена (змейка движется)
 
-    # --- 7. Отрисовка на экране ---
-    screen.fill(lightGrean) # Заливаем фон
+    # -------------- 7. Отрисовка на экране --------------
+    screen.fill(LIGHT_GREEN) # Заливаем фон
+
+    # Рисуем верхнюю информационную панель
+    pygame.draw.rect(screen, WHITE, (0, 0, SCREEN_WIDTH, INFO_BAR_HEIGHT))
+
     draw_grid() # Рисуем сетку
 
     # Отрисовка еды
     pygame.draw.rect(screen, RED,
-                     (food[0] * GRID_SIZE, food[1] * GRID_SIZE,
+                     (food[0] * GRID_SIZE, INFO_BAR_HEIGHT + food[1] * GRID_SIZE,
                       GRID_SIZE, GRID_SIZE))
 
-    # Отрисовка змейки
-    for segment in snake:
-        pygame.draw.rect(screen, BLUE,
-                         (segment[0] * GRID_SIZE, segment[1] * GRID_SIZE,
+    # Отрисовка змейки: голова синяя, тело светло-синее
+    for idx, segment in enumerate(snake):
+        color = BLUE if idx == 0 else LIGHT_BLUE
+        pygame.draw.rect(screen, color,
+                         (segment[0] * GRID_SIZE, INFO_BAR_HEIGHT + segment[1] * GRID_SIZE,
                           GRID_SIZE, GRID_SIZE))
 
     # Отрисовка счета
     score_text = font.render(f"Счет: {score}", True, BLACK)
-    screen.blit(score_text, (5, 5))
+    screen.blit(score_text, (10, (INFO_BAR_HEIGHT - score_text.get_height()) // 2))
 
     # Отрисовка сообщения "Game Over"
     if game_over:
-        game_over_text = font.render("ИГРА ОКОНЧЕНА! Нажмите R для перезапуска.", True, BLACK)
-        text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-        screen.blit(game_over_text, text_rect)
+        message = "Победа! Нажмите R для перезапуска." if game_won else "Проигрыш! Нажмите R для перезапуска."
+        status_text = font.render(message, True, BLACK)
+        text_rect = status_text.get_rect(center=(365, INFO_BAR_HEIGHT / 2))
+        screen.blit(status_text, text_rect)
 
     # Обновление всего экрана
     pygame.display.flip()
