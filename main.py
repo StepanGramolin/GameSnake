@@ -14,11 +14,12 @@ GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 # Цвета
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
-lightGrean = (120, 215, 120)
+LIGHT_GREEN = (120, 215, 120)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 GRAY = (120, 120, 120)
-BLUE = (20,20,200)
+BLUE = (51,51,255)
+LIGHT_BLUE = (65, 105, 255)
 
 SNAKE_SPEED = 10  # Скорость змейки (количество движений в секунду)
 
@@ -114,7 +115,7 @@ while running:
                 snake.pop() # Удаляем хвост, если еда не была съедена (змейка движется)
 
     # --- 7. Отрисовка на экране ---
-    screen.fill(lightGrean) # Заливаем фон
+    screen.fill(LIGHT_GREEN) # Заливаем фон
     draw_grid() # Рисуем сетку
 
     # Отрисовка еды
@@ -122,9 +123,10 @@ while running:
                      (food[0] * GRID_SIZE, food[1] * GRID_SIZE,
                       GRID_SIZE, GRID_SIZE))
 
-    # Отрисовка змейки
-    for segment in snake:
-        pygame.draw.rect(screen, BLUE,
+    # Отрисовка змейки: голова синяя, тело светло-синее
+    for idx, segment in enumerate(snake):
+        color = BLUE if idx == 0 else LIGHT_BLUE
+        pygame.draw.rect(screen, color,
                          (segment[0] * GRID_SIZE, segment[1] * GRID_SIZE,
                           GRID_SIZE, GRID_SIZE))
 
